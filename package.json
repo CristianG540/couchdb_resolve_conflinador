@@ -5,19 +5,29 @@
   "main": "index.js",
   "scripts": {
     "start": "node dist/bundle.js",
-    "build": "webpack -w"
+    "build": "webpack -w",
+    "lint": "standard | snazzy"
   },
   "dependencies": {
     "bluebird": "^3.5.1",
     "nano": "^6.4.2"
   },
-  "keywords": [],
-  "author": "CristianG540",
-  "license": "ISC",
   "devDependencies": {
     "babel-core": "^6.26.0",
+    "babel-eslint": "^8.0.3",
     "babel-loader": "^7.1.2",
     "babel-preset-env": "^1.6.1",
+    "snazzy": "^7.0.0",
+    "standard": "*",
     "webpack": "^3.10.0"
-  }
+  },
+  "standard": {
+    "parser": "babel-eslint",
+    "ignore": [
+      "/src/modules/deconflict.js"
+    ]
+  },
+  "keywords": [],
+  "author": "CristianG540",
+  "license": "ISC"
 }
