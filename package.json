@@ -24,7 +24,6 @@
   "standard": {
     "parser": "babel-eslint",
     "ignore": [
-      "/src/modules/deconflict.js"
     ]
   },
   "keywords": [],

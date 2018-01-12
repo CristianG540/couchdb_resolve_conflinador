@@ -65,6 +65,75 @@ var latestWins = function(db, docid, fieldname, callback) {
     db.bulk({ docs: doclist }, callback);
   });
 };
+/**
+ * Esta funcion esta hecha especificamente para corregir los conflictos de la base de datos
+ * de productos de IGB
+ * @param {*} db database 'db' (a nano object)
+ * @param {*} docid el id del documento/registro al q se le desean resolver los conflictos
+ * @param {*} fieldname nombre del atributo de origen q se quiere verificar, en este caso seria el atributo 'origen' en la bd de productos
+ * @param {*} origin valor del origen q va a tener prioridad a la hora de resolver los conflictos, en el caso de la bd de igb seria el origen de 'sap'
+ * @param {*} callback clousure que contiene los datos de la resolucion de los conflictos
+ */
+var originWins = (db, docid, fieldname, origin, callback) => {
+  // fetch the document with open_revs=all
+  db.get(docid, { open_revs: 'all' }, (err, data) => {
+    // return if document isn't there
+    if (err) {
+      return callback(err)
+    }
+
+    // remove 'deleted' leaf nodes from the list
+    let doclist = filterList(data)
+
+    // if the there is only <=1 revision left, the document is either deleted
+    // or not conflcited; either way, we're done
+    if (doclist.length < 1) {
+      return callback(new Error('Document is not conflicted.'))
+    }
+
+    let doclistNotOrigin = [] // Guardo los documentos con conflictos que no tienen el atributo de origen
+    let doclistOrigin = doclist.filter(doc => {
+      if (fieldname in doc) {
+        if (doc[fieldname] === origin) {
+          return true
+        }
+      } else {
+        doclistNotOrigin.push(doc)
+        return false
+      }
+    })
+
+    if (doclistOrigin.length > 0) {
+      // sort the array of documents by the supplied fieldname
+      // our winner will be the last object in the sorted array
+      doclistOrigin.sort(function (a, b) {
+        return a.updated_at - b.updated_at
+      })
+      let last = doclistOrigin.pop() // remove the winning revision from the array
+      // remove 'deleted' leaf nodes from the list
+      doclist = filterList(data, last._rev)
+      // turn the remaining leaf nodes into deletions
+      doclist = convertToDeletions(doclist)
+      // now we can delete the unwanted revisions
+      return db.bulk({ docs: doclist }, callback)
+    }
+
+    if (doclistNotOrigin.length > 0) {
+      doclistNotOrigin.sort(function (a, b) {
+        return a._rev - b._rev
+      })
+      let last = doclistNotOrigin.pop() // remove the winning revision from the array
+      // remove 'deleted' leaf nodes from the list
+      doclist = filterList(data, last._rev)
+      // turn the remaining leaf nodes into deletions
+      doclist = convertToDeletions(doclist)
+      // now we can delete the unwanted revisions
+      return db.bulk({ docs: doclist }, callback)
+    }
+
+    return callback(err, [])
+  })
+}
 
 // In a database 'db' (a nano object), that has document with id 'docid', resolve the
 // conflicts by merging all of the conflicting revisions together(!)
@@ -133,5 +202,6 @@ var nominated = function(db, docid, rev, callback) {
 export {
     latestWins,
     merge,
-    nominated
-};
+    nominated,
+    originWins
+}

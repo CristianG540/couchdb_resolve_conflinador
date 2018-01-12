@@ -1,9 +1,9 @@
 import Promise from 'bluebird'
-import { merge } from './modules/deconflict'
+import { originWins } from './modules/deconflict'
 import { env } from './modules/config'
 
 const nano = require('nano')(`https://${env.db.user}:${env.db.pass}@${env.db.url}`)
-const remoteDB = nano.db.use('productos_prod')
+const remoteDB = nano.db.use('producto')
 
 // create Promise-compatible versions of all functions
 Promise.promisifyAll(remoteDB)
@@ -13,7 +13,7 @@ setInterval(() => {
     limit: 30
   }).then(docs => {
     docs.rows.forEach(doc => {
-      merge(remoteDB, doc.id, (err, data) => {
+      originWins(remoteDB, doc.id, 'origen', 'sap', (err, data) => {
         if (!err) {
           console.log('merge', data)
         } else {
@@ -24,4 +24,4 @@ setInterval(() => {
   }).catch(err => {
     console.error('Error alldocs', err)
   })
-}, 10000)
+}, 40000)
