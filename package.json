@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "bluebird": "^3.5.1",
-    "nano": "^6.4.2"
+    "lodash": "^4.17.5",
+    "nano": "^6.4.2",
+    "papaparse": "^4.3.7"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
@@ -23,8 +25,7 @@
   },
   "standard": {
     "parser": "babel-eslint",
-    "ignore": [
-    ]
+    "ignore": []
   },
   "keywords": [],
   "author": "CristianG540",
