@@ -6,8 +6,6 @@ import { env } from './modules/config'
 import { LookForDiffs } from './modules/lookForDiffs'
 
 const fs = require('fs')
-const os = require('os')
-const path = require('path')
 const nano = require('nano')(`https://${env.db.user}:${env.db.pass}@${env.db.url}`)
 const remoteDB = nano.db.use('producto_1')
 
@@ -17,7 +15,7 @@ let lookForDiffs = new LookForDiffs()
 Promise.promisifyAll(remoteDB)
 
 setInterval(() => {
-  let fileStream = fs.createReadStream(path.resolve(os.tmpdir(), 'fz3temp-3', 'product.txt'))
+  let fileStream = fs.createReadStream(env.prods_sap_file) // path.resolve(os.tmpdir(), 'fz3temp-3', 'product.txt')
   Papa.parse(fileStream, {
     header: true,
     complete: csvParsed => {
