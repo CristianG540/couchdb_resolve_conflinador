@@ -7,7 +7,7 @@ import { LookForDiffs } from './modules/lookForDiffs'
 
 const fs = require('fs')
 const nano = require('nano')(`https://${env.db.user}:${env.db.pass}@${env.db.url}`)
-const remoteDB = nano.db.use('producto_1')
+const remoteDB = nano.db.use('producto_2')
 
 let lookForDiffs = new LookForDiffs()
 
