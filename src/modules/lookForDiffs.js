@@ -2,7 +2,7 @@ import Promise from 'bluebird'
 import _ from 'lodash'
 import { env } from './config'
 const nano = require('nano')(`https://${env.db.user}:${env.db.pass}@${env.db.url}`)
-const remoteDB = nano.db.use('producto_2')
+const remoteDB = nano.db.use('producto_3')
 // create Promise-compatible versions of all functions
 Promise.promisifyAll(remoteDB)
 

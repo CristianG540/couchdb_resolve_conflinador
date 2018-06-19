@@ -7,7 +7,7 @@ import { LookForDiffs } from './modules/lookForDiffs'
 
 const fs = require('fs')
 const nano = require('nano')(`https://${env.db.user}:${env.db.pass}@${env.db.url}`)
-const remoteDB = nano.db.use('producto_2')
+const remoteDB = nano.db.use('producto_3')
 
 let lookForDiffs = new LookForDiffs()
 
@@ -42,6 +42,7 @@ setInterval(() => {
   remoteDB.viewAsync('conflicts', 'all-conflicts-view', {
     limit: 30
   }).then(docs => {
+    // console.log('Conflictos', docs)
     docs.rows.forEach(doc => {
       originWins(remoteDB, doc.id, 'origen', 'sap', (err, data) => {
         if (!err) {
